@@ -1,78 +1,47 @@
 import React, { Component } from 'react'
-import { nanoid } from 'nanoid';
 
 import css from './App.module.css';
-import ContactForm from 'components/ContactForm/ContactForm';
-import Filter from 'components/Filter/Filter';
-import ContactList from 'components/ContactList/ContactList';
+import SectionFeedback from 'components/SectionFeedback/SectionFeedback';
+import FeedbackOptions from 'components/FeedbackOptions/FeedbackOptions';
+import StatisticsFeedback from 'components/StatisticsFeedback/StatisticsFeedback';
+import Notification from 'components/Notification/Notification'
 
 class App extends Component {
 
   state = {
-    contacts: [
-      {id: nanoid(), name: 'Rosie Simpson', number: '459-12-56'},
-      {id: nanoid(), name: 'Hermione Kline', number: '443-89-12'},
-      {id: nanoid(), name: 'Eden Clements', number: '645-17-79'},
-      {id: nanoid(), name: 'Annie Copeland', number: '227-91-26'},
-    ],
-    filter: '',
+    good: 0,
+    neutral: 0,
+    bad: 0
+  }
+  
+  handleIncrement = (option) => {
+    this.setState((prevState) => {
+      return {
+        [option]: prevState[option] + 1,
+      };
+  });
   }
 
-  handleChange = e => {
-    const {name, value} = e.target
-    this.setState({[name]: value, [name]: value })
+  countTotalFeedback = () => {
+    const { good, neutral, bad } = this.state;
+    return good + neutral + bad;
   }
 
-  addContact = ({ name, number }) => {
-    const { contacts } = this.state;
-    const nameNormalize = name.toLowerCase();
-    const isExist = contacts.find(contact => nameNormalize === contact.name.toLocaleLowerCase())
-   
-    if (isExist) {
-      alert(`${name} is already in contacts.`);
-      return
-    } 
-
-    const contact = {
-      name: name,
-      number: number,
-      id: nanoid()
-    }
-    
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, contact]
-    }))
-    
-    
-  }
-
-  findContact = () => {
-    const { filter, contacts } = this.state;
-    const filterNormalize = filter.toLowerCase();
-    return (
-      contacts.filter(({ name }) => name.toLowerCase().includes(filterNormalize))
-    )
-  }
-
-  deleteContact = (id) => {
-    const { contacts } = this.state;
-    const contactsUpdate = contacts.filter(contact => contact.id !== id)
-    this.setState({
-      contacts: contactsUpdate,
-    })
-  }
-
+  countPositiveFeedbackPercentage = () => (this.countTotalFeedback() > 0 ? Math.round((this.state.good * 100) / this.countTotalFeedback()) : 0);
+  
   render() {
-    const { filter } = this.state
+    const options = Object.keys(this.state);
+    const total = this.countTotalFeedback();
+
     return (
       <div className={css.container}>
-          <h1>Phonebook</h1>
-          <ContactForm addContact={this.addContact} />
+      <SectionFeedback title='please leave feedback'>
+        <FeedbackOptions options={options} handleIncrement={this.handleIncrement} />
+        </SectionFeedback>
         
-          <h2>Contacts</h2>
-          <Filter onChange={this.handleChange} filter={filter}></Filter>
-          <ContactList contactsData={this.findContact()} deleteContact={this.deleteContact} />
-        
+        <SectionFeedback title='statistics'>
+          {total <= 0 ? (<Notification message='There is no feedback' />) : (<StatisticsFeedback feedbackItem={this.state} total={total} positivePercentage={this.countPositiveFeedbackPercentage} /> )}
+        </SectionFeedback>
       </div>
     )
   }
