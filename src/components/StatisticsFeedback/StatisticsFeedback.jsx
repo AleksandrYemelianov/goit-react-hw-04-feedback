@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import css from './StatisticsFeedback.module.css';
 
-const StatisticsFeedback = ({ feedbackItem: {good, neutral, bad}, total, positivePercentage }) => {
+const StatisticsFeedback = ({ good, neutral, bad, total, positivePercentage }) => {
     return (
         <div>
             <ul className={css.list}>
@@ -28,9 +28,7 @@ export default StatisticsFeedback;
 StatisticsFeedback.propTypes = {
     positivePercentage: PropTypes.func.isRequired,
     total: PropTypes.number.isRequired,
-    feedbackItem : PropTypes.shape({
-        good: PropTypes.number.isRequired,
-        neutral: PropTypes.number.isRequired,
-        bad: PropTypes.number.isRequired,
-    })
+    good: PropTypes.number.isRequired,
+    neutral: PropTypes.number.isRequired,
+    bad: PropTypes.number.isRequired,
 }
